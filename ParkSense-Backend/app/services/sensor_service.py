@@ -49,6 +49,7 @@ class SensorService:
 
     @staticmethod
     def update_battery_level(sensor_id, battery_level):
+        """Update sensor battery level"""
         sensor = Sensor.query.get(sensor_id)
         if not sensor:
             return None

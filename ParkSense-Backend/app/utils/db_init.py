@@ -12,7 +12,6 @@ def init_db():
 
 def populate_sample_data():
     """populate database with sample garage data"""
-
     if ParkingGarage.query.first():
         print("Sample data already exists. Skipping population.")
         return
@@ -34,7 +33,7 @@ def populate_sample_data():
             "name": "West Parking Garage",
             "address": "425 E San Carlos Street, San Jose, CA 95112",
             "total_floors": 4,
-            "total_spaces": 1312 
+            "total_spaces": 1312  
         }
     ]
 
@@ -47,7 +46,7 @@ def populate_sample_data():
             open_spaces=garage_data["total_spaces"]
         )
         db.session.add(garage)
-        db.session.flush() 
+        db.session.flush()  
 
         for floor in range(1, garage_data["total_floors"] + 1):
             camera = Camera(
@@ -92,12 +91,12 @@ def populate_sample_data():
                 db.session.add(sensor)
 
     db.session.commit()
-    print(f"sample data created, 3 garages (North, South, West) with parking spots and sensors")
+    print(f"Sample data created")
 
 def reset_db():
-    """drop all tables and recreate them"""
+    """Drop all tables and recreate them"""
     db.drop_all()
-    print("all tables dropped")
+    print("All tables dropped")
     init_db()
     populate_sample_data()
-    print("database reset complete")
+    print("Database reset complete")

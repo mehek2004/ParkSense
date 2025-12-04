@@ -15,7 +15,6 @@ class ParkingGarage(db.Model):
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
     updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
 
-    
     parking_spots = db.relationship('ParkingSpot', backref='garage', lazy=True, cascade='all, delete-orphan')
     cameras = db.relationship('Camera', backref='garage', lazy=True, cascade='all, delete-orphan')
 

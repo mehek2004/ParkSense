@@ -4,11 +4,6 @@ from app.services.parking_service import ParkingService
 
 @api_bp.route('/garages', methods=['GET'])
 def get_garages():
-    """
-    Get all parking garages
-    ---
-    GET /api/v1/garages
-    """
     garages = ParkingService.get_all_garages()
     return jsonify({
         'success': True,
@@ -18,11 +13,6 @@ def get_garages():
 
 @api_bp.route('/garages/<int:garage_id>', methods=['GET'])
 def get_garage(garage_id):
-    """
-    Get specific garage by ID
-    ---
-    GET /api/v1/garages/{garage_id}
-    """
     garage = ParkingService.get_garage_by_id(garage_id)
 
     if not garage:
@@ -38,11 +28,6 @@ def get_garage(garage_id):
 
 @api_bp.route('/garages/<int:garage_id>/availability', methods=['GET'])
 def get_garage_availability(garage_id):
-    """
-    Get real-time availability for entire garage
-    ---
-    GET /api/v1/garages/{garage_id}/availability
-    """
     availability = ParkingService.get_garage_availability(garage_id)
 
     if not availability:
@@ -58,11 +43,6 @@ def get_garage_availability(garage_id):
 
 @api_bp.route('/garages/<int:garage_id>/floors/<int:floor_number>', methods=['GET'])
 def get_floor_availability(garage_id, floor_number):
-    """
-    Get availability for specific floor
-    ---
-    GET /api/v1/garages/{garage_id}/floors/{floor_number}
-    """
     availability = ParkingService.get_floor_availability(garage_id, floor_number)
 
     if not availability:
@@ -78,11 +58,6 @@ def get_floor_availability(garage_id, floor_number):
 
 @api_bp.route('/garages/<int:garage_id>/spots/type/<spot_type>', methods=['GET'])
 def get_spots_by_type(garage_id, spot_type):
-    """
-    Get available spots by type (regular, handicap, staff, paid)
-    ---
-    GET /api/v1/garages/{garage_id}/spots/type/{spot_type}
-    """
     if spot_type not in ['regular', 'handicap', 'staff', 'paid']:
         return jsonify({
             'success': False,

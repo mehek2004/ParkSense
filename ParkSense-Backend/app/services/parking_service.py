@@ -9,13 +9,11 @@ class ParkingService:
 
     @staticmethod
     def get_all_garages():
-        """Get all parking garages"""
         garages = ParkingGarage.query.all()
         return [garage.to_dict() for garage in garages]
 
     @staticmethod
     def get_garage_by_id(garage_id):
-        """Get garage by ID"""
         garage = ParkingGarage.query.get(garage_id)
         if not garage:
             return None
@@ -23,7 +21,6 @@ class ParkingService:
 
     @staticmethod
     def get_garage_availability(garage_id):
-        """Get real-time availability for a garage"""
         garage = ParkingGarage.query.get(garage_id)
         if not garage:
             return None
@@ -57,7 +54,6 @@ class ParkingService:
 
     @staticmethod
     def get_floor_availability(garage_id, floor_number):
-        """Get availability for specific floor"""
         spots = ParkingSpot.query.filter_by(
             garage_id=garage_id,
             floor_number=floor_number
@@ -80,7 +76,6 @@ class ParkingService:
 
     @staticmethod
     def get_spot_by_id(space_id):
-        """Get specific parking spot"""
         spot = ParkingSpot.query.get(space_id)
         if not spot:
             return None
@@ -88,7 +83,6 @@ class ParkingService:
 
     @staticmethod
     def update_spot_occupancy(space_id, is_occupied):
-        """Update parking spot occupancy status"""
         spot = ParkingSpot.query.get(space_id)
         if not spot:
             return None
@@ -116,7 +110,6 @@ class ParkingService:
 
     @staticmethod
     def get_available_spots_by_type(garage_id, spot_type):
-        """Get available spots filtered by type"""
         spots = ParkingSpot.query.filter_by(
             garage_id=garage_id,
             spot_type=spot_type,
@@ -127,7 +120,6 @@ class ParkingService:
 
     @staticmethod
     def get_occupancy_history(space_id, hours=24):
-        """Get occupancy history for a spot"""
         cutoff = datetime.utcnow() - timedelta(hours=hours)
 
         history = OccupancyHistory.query.filter(

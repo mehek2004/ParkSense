@@ -1,4 +1,4 @@
-from flask import jsonify, request
+from flask import jsonify, request, current_app
 from app.routes import api_bp
 from app.services.sensor_service import SensorService
 
@@ -35,7 +35,6 @@ def submit_sensor_reading(sensor_id):
 
 @api_bp.route('/sensors/<int:sensor_id>', methods=['GET'])
 def get_sensor_status(sensor_id):
-
     status = SensorService.get_sensor_status(sensor_id)
 
     if not status:
@@ -89,4 +88,24 @@ def get_all_sensors_health():
     return jsonify({
         'success': True,
         'data': health
+    }), 200
+
+@api_bp.route('/polling/status', methods=['GET'])
+def get_polling_status():
+    polling_service = current_app.extensions.get('polling_service')
+
+    if not polling_service:
+        return jsonify({
+            'success': True,
+            'data': {
+                'enabled': False,
+                'message': 'Polling service not initialized'
+            }
+        }), 200
+
+    status = polling_service.get_status()
+
+    return jsonify({
+        'success': True,
+        'data': status
     }), 200

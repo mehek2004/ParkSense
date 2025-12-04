@@ -24,6 +24,10 @@ def create_app(config_class=Config):
     db.init_app(app)
     CORS(app)
 
+    with app.app_context():
+        from app.scheduler import init_scheduler
+        init_scheduler(app)
+
     from app.routes import api_bp
     app.register_blueprint(api_bp, url_prefix='/api/v1')
 
