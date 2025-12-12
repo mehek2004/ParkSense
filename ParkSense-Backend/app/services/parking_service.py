@@ -1,4 +1,5 @@
 from datetime import datetime, timedelta
+from sqlalchemy.orm import joinedload
 from app import db
 from app.models.parking_garage import ParkingGarage
 from app.models.parking_spot import ParkingSpot
@@ -25,7 +26,9 @@ class ParkingService:
         if not garage:
             return None
 
-        spots = ParkingSpot.query.filter_by(garage_id=garage_id).all()
+        spots = ParkingSpot.query.options(
+            db.joinedload(ParkingSpot.sensor)
+        ).filter_by(garage_id=garage_id).all()
 
         availability_by_floor = {}
         for spot in spots:
@@ -54,7 +57,9 @@ class ParkingService:
 
     @staticmethod
     def get_floor_availability(garage_id, floor_number):
-        spots = ParkingSpot.query.filter_by(
+        spots = ParkingSpot.query.options(
+            db.joinedload(ParkingSpot.sensor)
+        ).filter_by(
             garage_id=garage_id,
             floor_number=floor_number
         ).all()
@@ -110,7 +115,9 @@ class ParkingService:
 
     @staticmethod
     def get_available_spots_by_type(garage_id, spot_type):
-        spots = ParkingSpot.query.filter_by(
+        spots = ParkingSpot.query.options(
+            db.joinedload(ParkingSpot.sensor)
+        ).filter_by(
             garage_id=garage_id,
             spot_type=spot_type,
             is_occupied=False

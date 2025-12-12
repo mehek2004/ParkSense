@@ -17,6 +17,12 @@ class ParkingSpot(db.Model):
 
     __table_args__ = (
         db.UniqueConstraint('garage_id', 'floor_number', 'spot_number', name='unique_spot'),
+        db.Index('idx_garage_id', 'garage_id'),
+        db.Index('idx_floor_number', 'floor_number'),
+        db.Index('idx_spot_type', 'spot_type'),
+        db.Index('idx_is_occupied', 'is_occupied'),
+        db.Index('idx_garage_type_occupied', 'garage_id', 'spot_type', 'is_occupied'),
+        db.Index('idx_garage_floor', 'garage_id', 'floor_number'),
     )
 
     def to_dict(self):

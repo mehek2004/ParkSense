@@ -120,227 +120,201 @@ struct SummaryStatView: View {
 
 struct ParkingGarageMapView: View {
     let spots: [ParkingSpot]
-    private let totalAisles = 8
-    private let wallSpotsPerSection = 8             
-    private let middleSpotsPerRow = 10          
-    private let topBottomSpots = 20               
 
     var body: some View {
-        ZStack(alignment: .trailing) {
-            VStack(spacing: 0) {
-                
-                HStack(spacing: 0) {
-                    ForEach(getTopBottomSpots(isTop: true)) { spot in
-                        ParkingSpotView(spot: spot, orientation: .horizontal)
-                    }
-                }
-                .frame(height: 11)
-                .padding(4)
-                .background(Color.white.opacity(0.5))
+        VStack(spacing: 0) {
+            AngledWallSection(spots: getTopWallSpots(), isTop: true)
 
-                ForEach(0..<totalAisles, id: \.self) { aisleIndex in
-    
-                    GarageAisleSection(
-                        leftWallSpots: getSpots(for: aisleIndex, section: .leftWall),
-                        rightWallSpots: getSpots(for: aisleIndex, section: .rightWall),
-                        topMiddleSpots: getSpots(for: aisleIndex, section: .topMiddle),
-                        bottomMiddleSpots: getSpots(for: aisleIndex, section: .bottomMiddle),
-                        aisleNumber: aisleIndex + 1,
-                        isGapRow: aisleIndex == 3 
-                    )
-                    .id(aisleIndex)
-                }
+            HStack(spacing: 0) {
+                Color.clear
+                    .frame(width: 50)
 
-                HStack(spacing: 0) {
-                    ForEach(getTopBottomSpots(isTop: false)) { spot in
-                        ParkingSpotView(spot: spot, orientation: .horizontal)
-                    }
-                }
-                .frame(height: 11)
-                .padding(4)
-                .background(Color.white.opacity(0.5))
+                Color.clear
+                    .frame(width: 16)
+
+                Rectangle()
+                    .fill(Color.clear)
+                    .frame(height: 22)
+
+                Color.clear
+                    .frame(width: 16)
+
+                Color.clear
+                    .frame(width: 50)
             }
-            .background(Color(.systemGray6))
-            .cornerRadius(12)
 
-            VStack(alignment: .trailing, spacing: 0) {
-                Spacer()
-                    .frame(height: calculateOffsetForAisle(2))
+            HStack(spacing: 0) {
+                LeftWallSection(spots: getLeftWallSpots())
 
-                EntranceExitIndicator(type: .entrance)
-                    .padding(.trailing, -5)
+                Rectangle()
+                    .fill(Color.clear)
+                    .frame(width: 16)
 
-                Spacer()
-                    .frame(height: calculateOffsetForAisle(5) - calculateOffsetForAisle(2) - 20)
+                MiddleSection(getRowSpots: getMiddleRowSpots)
 
-                EntranceExitIndicator(type: .exit)
-                    .padding(.trailing, -5)
+                Rectangle()
+                    .fill(Color.clear)
+                    .frame(width: 16)
 
-                Spacer()
+                RightWallSection(
+                    topSpots: getRightWallTopSpots(),
+                    bottomSpots: getRightWallBottomSpots()
+                )
             }
+
+            AngledWallSection(spots: getBottomWallSpots(), isTop: false)
         }
+        .background(Color(.systemGray6))
+        .cornerRadius(12)
     }
 
-    private func calculateOffsetForAisle(_ aisleIndex: Int) -> CGFloat {
-        let topRowHeight: CGFloat = 11 + 8 
-        let aisleHeight: CGFloat = 136 
-
-        var offset = topRowHeight
-        offset += (aisleHeight * CGFloat(aisleIndex))
-        return offset + 68 
-    }
-
-    private func getTopBottomSpots(isTop: Bool) -> [ParkingSpot] {
-        
-        let fullAisleSpots = wallSpotsPerSection * 2 + middleSpotsPerRow * 2 
-        let partialAisleSpots = wallSpotsPerSection + middleSpotsPerRow * 2 
-        let totalAisleSpots = (fullAisleSpots * 2) + (partialAisleSpots * 4) + (fullAisleSpots * 2)
-
-        if isTop {
-            let startIndex = totalAisleSpots
-            let endIndex = min(startIndex + topBottomSpots, spots.count)
-            guard startIndex < spots.count else { return [] }
-            return Array(spots[startIndex..<endIndex])
-        } else {
-            let startIndex = totalAisleSpots + topBottomSpots
-            let endIndex = min(startIndex + topBottomSpots, spots.count)
-            guard startIndex < spots.count else { return [] }
-            return Array(spots[startIndex..<endIndex])
-        }
-    }
-
-    private func getSpots(for aisleIndex: Int, section: ParkingSection) -> [ParkingSpot] {
-
-        var baseIndex = 0
-        let fullAisleSpots = wallSpotsPerSection * 2 + middleSpotsPerRow * 2 
-        let partialAisleSpots = wallSpotsPerSection + middleSpotsPerRow * 2 
-
-        for i in 0..<aisleIndex {
-            if i >= 2 && i <= 5 {
-              
-                baseIndex += partialAisleSpots
-            } else {
-                baseIndex += fullAisleSpots
-            }
-        }
-
-       
-        if section == .rightWall && aisleIndex >= 2 && aisleIndex <= 5 {
-            return []
-        }
-
-        let startIndex: Int
-        let count: Int
-
-        switch section {
-        case .leftWall:
-            startIndex = baseIndex
-            count = wallSpotsPerSection
-        case .topMiddle:
-            startIndex = baseIndex + wallSpotsPerSection
-            count = middleSpotsPerRow
-        case .bottomMiddle:
-            startIndex = baseIndex + wallSpotsPerSection + middleSpotsPerRow
-            count = middleSpotsPerRow
-        case .rightWall:
-            startIndex = baseIndex + wallSpotsPerSection + middleSpotsPerRow * 2
-            count = wallSpotsPerSection
-        }
-
-        let endIndex = min(startIndex + count, spots.count)
+    private func getTopWallSpots() -> [ParkingSpot] {
+        let startIndex = 0
+        let endIndex = min(startIndex + 27, spots.count)
         guard startIndex < spots.count else { return [] }
         return Array(spots[startIndex..<endIndex])
     }
 
-    enum ParkingSection {
-        case leftWall, rightWall, topMiddle, bottomMiddle
+    private func getLeftWallSpots() -> [ParkingSpot] {
+        let startIndex = 27
+        let endIndex = min(startIndex + 42, spots.count)
+        guard startIndex < spots.count else { return [] }
+        return Array(spots[startIndex..<endIndex])
+    }
+
+    private func getRightWallTopSpots() -> [ParkingSpot] {
+        let startIndex = 69
+        let endIndex = min(startIndex + 14, spots.count)
+        guard startIndex < spots.count else { return [] }
+        return Array(spots[startIndex..<endIndex])
+    }
+
+    private func getRightWallBottomSpots() -> [ParkingSpot] {
+        let startIndex = 83
+        let endIndex = min(startIndex + 14, spots.count)
+        guard startIndex < spots.count else { return [] }
+        return Array(spots[startIndex..<endIndex])
+    }
+
+    private func getMiddleRowSpots(rowNumber: Int) -> [ParkingSpot] {
+        let startIndex = 97 + (rowNumber * 22)
+        let endIndex = min(startIndex + 22, spots.count)
+        guard startIndex < spots.count else { return [] }
+        return Array(spots[startIndex..<endIndex])
+    }
+
+    private func getBottomWallSpots() -> [ParkingSpot] {
+        let startIndex = 361
+        let endIndex = min(startIndex + 27, spots.count)
+        guard startIndex < spots.count else { return [] }
+        return Array(spots[startIndex..<endIndex])
     }
 }
 
-struct EntranceExitIndicator: View {
-    let type: IndicatorType
-
-    var body: some View {
-        HStack(spacing: 3) {
-            Image(systemName: type == .entrance ? "arrow.down" : "arrow.up")
-                .font(.system(size: 8))
-                .foregroundColor(.white)
-            Text(type == .entrance ? "IN" : "OUT")
-                .font(.system(size: 8, weight: .bold))
-                .foregroundColor(.white)
-        }
-        .padding(.horizontal, 8)
-        .padding(.vertical, 4)
-        .background(type == .entrance ? Color.sjsuBlue : Color.sjsuGold)
-        .cornerRadius(8)
-        .shadow(color: .black.opacity(0.2), radius: 2, x: 0, y: 1)
-    }
-
-    enum IndicatorType {
-        case entrance, exit
-    }
-}
-
-struct GarageAisleSection: View {
-    let leftWallSpots: [ParkingSpot]
-    let rightWallSpots: [ParkingSpot]
-    let topMiddleSpots: [ParkingSpot]
-    let bottomMiddleSpots: [ParkingSpot]
-    let aisleNumber: Int
-    let isGapRow: Bool
+struct AngledWallSection: View {
+    let spots: [ParkingSpot]
+    let isTop: Bool
 
     var body: some View {
         HStack(spacing: 0) {
-            VStack(spacing: 0) {
-                ForEach(leftWallSpots) { spot in
-                    ParkingSpotView(spot: spot, orientation: .perpendicular)
-                        .frame(height: 15)
-                }
+            ForEach(spots) { spot in
+                ParkingSpotView(spot: spot, orientation: .angled)
+                    .frame(width: 14, height: 28)
+                    .rotationEffect(.degrees(45))
             }
-            .frame(width: 50)
-
-            Rectangle()
-                .fill(Color.clear)
-                .frame(width: 16)
-
-            VStack(spacing: 2) {
-                if !topMiddleSpots.isEmpty {
-                    HStack(spacing: 0) {
-                        ForEach(topMiddleSpots) { spot in
-                            ParkingSpotView(spot: spot, orientation: .horizontal)
-                        }
-                    }
-                    .frame(height: 25)
-                }
-
-                Rectangle()
-                    .fill(isGapRow ? Color.gray.opacity(0.2) : Color.gray.opacity(0.12))
-                    .frame(height: 16)
-
-                if !bottomMiddleSpots.isEmpty {
-                    HStack(spacing: 0) {
-                        ForEach(bottomMiddleSpots) { spot in
-                            ParkingSpotView(spot: spot, orientation: .horizontal)
-                        }
-                    }
-                    .frame(height: 25)
-                }
-            }
-
-            Rectangle()
-                .fill(Color.clear)
-                .frame(width: 8)
-
-            VStack(spacing: 0) {
-                ForEach(rightWallSpots) { spot in
-                    ParkingSpotView(spot: spot, orientation: .perpendicular)
-                        .frame(height: 15)
-                }
-            }
-            .frame(width: 50)
         }
-        .frame(height: 136)
+        .frame(height: 35)
+        .padding(.vertical, 4)
         .background(Color.white.opacity(0.5))
+    }
+}
+
+struct LeftWallSection: View {
+    let spots: [ParkingSpot]
+
+    var body: some View {
+        VStack(spacing: 0) {
+            ForEach(spots) { spot in
+                ParkingSpotView(spot: spot, orientation: .perpendicular)
+                    .frame(width: 50, height: 15)
+            }
+        }
+        .frame(width: 50)
+    }
+}
+
+struct RightWallSection: View {
+    let topSpots: [ParkingSpot]
+    let bottomSpots: [ParkingSpot]
+
+    private let spotHeight: CGFloat = 15
+
+    var body: some View {
+        VStack(spacing: 0) {
+            VStack(spacing: 0) {
+                ForEach(topSpots) { spot in
+                    ParkingSpotView(spot: spot, orientation: .perpendicular)
+                        .frame(width: 50, height: spotHeight)
+                }
+            }
+            .frame(height: spotHeight * 14)
+
+            Spacer()
+                .frame(height: spotHeight * 14)
+
+            VStack(spacing: 0) {
+                ForEach(bottomSpots) { spot in
+                    ParkingSpotView(spot: spot, orientation: .perpendicular)
+                        .frame(width: 50, height: spotHeight)
+                }
+            }
+            .frame(height: spotHeight * 14)
+        }
+        .frame(width: 50)
+    }
+}
+
+struct MiddleSection: View {
+    let getRowSpots: (Int) -> [ParkingSpot]
+
+    var body: some View {
+        VStack(spacing: 4) {
+            ForEach(0..<6, id: \.self) { segmentIndex in
+                SegmentView(
+                    topRowSpots: getRowSpots(segmentIndex * 2),
+                    bottomRowSpots: getRowSpots(segmentIndex * 2 + 1),
+                    segmentNumber: segmentIndex
+                )
+            }
+        }
+    }
+}
+
+struct SegmentView: View {
+    let topRowSpots: [ParkingSpot]
+    let bottomRowSpots: [ParkingSpot]
+    let segmentNumber: Int
+
+    var body: some View {
+        VStack(spacing: 3) {
+            HStack(spacing: 0) {
+                ForEach(topRowSpots) { spot in
+                    ParkingSpotView(spot: spot, orientation: .horizontal)
+                }
+            }
+            .frame(height: 35)
+
+            HStack(spacing: 0) {
+                ForEach(bottomRowSpots) { spot in
+                    ParkingSpotView(spot: spot, orientation: .horizontal)
+                }
+            }
+            .frame(height: 35)
+
+            Rectangle()
+                .fill(Color.clear)
+                .frame(height: 22)
+        }
     }
 }
 
@@ -349,7 +323,6 @@ struct ParkingSpotView: View {
     let orientation: SpotOrientation
 
     var body: some View {
-        
         Rectangle()
             .fill(backgroundColor)
             .overlay(
@@ -415,7 +388,9 @@ struct ParkingSpotView: View {
     }
 
     enum SpotOrientation {
-        case horizontal, perpendicular
+        case horizontal     
+        case perpendicular  
+        case angled         
     }
 }
 

@@ -6,12 +6,11 @@ from app.models.sensor import Sensor
 from app.models.camera import Camera
 
 def init_db():
-    """initialize database with tables"""
     db.create_all()
     print("Database tables created successfully")
 
 def populate_sample_data():
-    """populate database with sample garage data"""
+
     if ParkingGarage.query.first():
         print("Sample data already exists. Skipping population.")
         return
@@ -21,19 +20,19 @@ def populate_sample_data():
             "name": "North Parking Garage",
             "address": "330 S 7th Street, San Jose, CA 95112",
             "total_floors": 5,
-            "total_spaces": 1640  
+            "total_spaces": 1940  
         },
         {
             "name": "South Parking Garage",
             "address": "288 S 7th Street, San Jose, CA 95112",
             "total_floors": 6,
-            "total_spaces": 1968  
+            "total_spaces": 2328  
         },
         {
             "name": "West Parking Garage",
             "address": "425 E San Carlos Street, San Jose, CA 95112",
             "total_floors": 4,
-            "total_spaces": 1312  
+            "total_spaces": 1552  
         }
     ]
 
@@ -61,12 +60,15 @@ def populate_sample_data():
 
         for floor in range(1, garage_data["total_floors"] + 1):
             for spot_num in range(1, spots_per_floor + 1):
+                
                 if spot_num <= 5:
                     spot_type = 'handicap'
-                elif spot_num <= 10:
-                    spot_type = 'staff'
+                elif spot_num == 7 or spot_num == 21:
+                    spot_type = 'ev'  
+                elif spot_num == 368 or spot_num == 382:
+                    spot_type = 'ev' 
                 elif spot_num <= 15:
-                    spot_type = 'ev'
+                    spot_type = 'staff'
                 else:
                     spot_type = 'regular'
 
@@ -91,10 +93,9 @@ def populate_sample_data():
                 db.session.add(sensor)
 
     db.session.commit()
-    print(f"Sample data created")
+    print(f"Sample data created: 3 garages (North, South, West) with parking spots and sensors")
 
 def reset_db():
-    """Drop all tables and recreate them"""
     db.drop_all()
     print("All tables dropped")
     init_db()
